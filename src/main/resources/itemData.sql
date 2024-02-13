@@ -1,1 +1,1 @@
-INSERT INTO `item` VALUES (default, 'Book','Pinochio');
+INSERT INTO `item` VALUES (default, 'Book','Pinochio',null);

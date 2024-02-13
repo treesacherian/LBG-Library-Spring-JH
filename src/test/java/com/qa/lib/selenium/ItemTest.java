@@ -15,9 +15,13 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(OrderAnnotation.class)
+@Sql(scripts = { "classpath:itemSchema.sql",
+		"classpath:itemData.sql" }, executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 public class ItemTest {
 
 	private RemoteWebDriver driver;
@@ -29,14 +33,15 @@ public class ItemTest {
 	void init() {
 		this.driver = new ChromeDriver();
 		this.driver.manage().window().maximize();
-		this.driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(3));
+		this.driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
 	}
 
 	@Test
-	@Order(1)
+	@Order(2)
 	void testCreateBook() {
 		this.driver.get("http://localhost:" + this.port);
-		String book = "BarryBook";
+
+		String book = "Spiderman";
 		String type = "Book";
 		WebElement btype = this.driver.findElement(By.cssSelector(
 				"#root > main > div > section:nth-child(2) > div:nth-child(2) > form > div > input:nth-child(1)"));
@@ -46,26 +51,26 @@ public class ItemTest {
 		WebElement bname = this.driver.findElement(By.cssSelector(
 				"#root > main > div > section:nth-child(2) > div:nth-child(2) > form > div > input:nth-child(2)"));
 //		bname.sendKeys(book);
-		bname.sendKeys("BarryBook");
+		bname.sendKeys("Spiderman");
 
 		WebElement add = this.driver.findElement(
 				By.cssSelector("#root > main > div > section:nth-child(2) > div:nth-child(2) > form > div > button"));
 		add.click();
 
-		WebElement created = this.driver
-				.findElement(By.cssSelector("#root > main > div > section:nth-child(2) > div:nth-child(3) > h3"));
+		WebElement created = this.driver.findElement(
+				By.cssSelector("#root > main > div > section:nth-child(2) > div:nth-child(3) > h3:nth-child(2)"));
 
-		Assertions.assertEquals(true, created.getText().contains("BarryBook"));
+		Assertions.assertEquals(true, created.getText().contains("Spiderman"));
 	}
 
 	@Test
-	@Order(2)
+	@Order(1)
 	void testGetBook() {
 		this.driver.get("http://localhost:" + this.port);
 
-		WebElement created1 = this.driver
+		WebElement created = this.driver
 				.findElement(By.cssSelector("#root > main > div > section:nth-child(2) > div:nth-child(3) > h3"));
-		Assertions.assertEquals("BarryBook (Book)", created1.getText());
+		Assertions.assertEquals("Pinochio (Book)", created.getText());
 	}
 
 //	@AfterEach
